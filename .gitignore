@@ -38,3 +38,6 @@ out/
 
 ### Rust ###
 /paillier-encryption-backend/target/
+
+### MacOS ###
+.DS_Store
