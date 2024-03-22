@@ -1,7 +1,7 @@
 package nl.tudelft.medtechchain.ttp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import nl.tudelft.medtechchain.ttp.encryption.paillier.PaillierDecryptionKey;
+import nl.tudelft.medtechchain.ttp.encryption.paillier.PaillierEncryptionKey;
 import nl.tudelft.medtechchain.ttp.encryption.paillier.PaillierHomomorphicEncryptionScheme;
 import nl.tudelft.medtechchain.ttp.encryption.paillier.PaillierKeyPair;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,18 +30,21 @@ public class TtpApplication {
 	@Bean
 	public PaillierKeyPair keyPair() {
 		PaillierHomomorphicEncryptionScheme scheme = new PaillierHomomorphicEncryptionScheme();
+
+		// First we check if application.properties has a generated keypair defined
+		// If it does, we create PaillierKeyPair object using the constructor and the defined values
 		if (!ekN.equals("null") && !dkP.equals("null") && !dkQ.equals("null")) {
 			try {
-				ObjectMapper mapper = new ObjectMapper();
-				ObjectNode keyPairNode = mapper.createObjectNode();
-				keyPairNode.put("encryptionKey", "{\"n\":\"" + ekN + "\"}");
-				keyPairNode.put("decryptionKey", "{\"p\":\"" + dkP + "\",\"q\":\"" + dkQ + "\"}");
-				String keyPairJson = mapper.writeValueAsString(keyPairNode);
-				return new PaillierKeyPair(keyPairJson);
+				PaillierEncryptionKey ek = new PaillierEncryptionKey(ekN);
+				PaillierDecryptionKey dk = new PaillierDecryptionKey(dkP, dkQ);
+				return new PaillierKeyPair(ek, dk);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
+		// If it does not have a generated keypair defined, we use the rust paillier backend to
+		// generate a keypair and then parse the json string it returns into a PaillierKeyPair object
 		String jsonKeypair = scheme.generateKeypair();
 		return new PaillierKeyPair(jsonKeypair);
 	}

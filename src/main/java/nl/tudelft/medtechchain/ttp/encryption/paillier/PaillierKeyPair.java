@@ -24,6 +24,11 @@ public class PaillierKeyPair implements KeyPair {
         }
     }
 
+    public PaillierKeyPair(PaillierEncryptionKey ek, PaillierDecryptionKey dk) {
+        this.encryptionKey = ek;
+        this.decryptionKey = dk;
+    }
+
     @Override
     public PaillierEncryptionKey getEncryptionKey() {
         return this.encryptionKey;

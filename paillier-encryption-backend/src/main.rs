@@ -74,25 +74,6 @@ fn main() {
 fn generate_keys() -> (EncryptionKey, DecryptionKey) {
     let (ek, dk) = Paillier::keypair().keys();
 
-    // println!("EncryptionKey: {:?}", ek);
-    // println!("DecryptionKey: {:?}", dk);
-    // // Serialize the EncryptionKey
-    // let serialized_ek = serde_json::to_string(&ek).expect("Failed to serialize EncryptionKey");
-    // // Serialize the DecryptionKey
-    // let serialized_dk = serde_json::to_string(&dk).expect("Failed to serialize DecryptionKey");
-    // println!("Serialized EncryptionKey: {}", serialized_ek);
-    // println!("Serialized DecryptionKey: {}", serialized_dk);
-
-    // // Deserialize the EncryptionKey
-    // let deserialized_ek: EncryptionKey =
-    //     serde_json::from_str(&serialized_ek).expect("Failed to deserialize EncryptionKey");
-    // println!("Deserialized EncryptionKey: {:?}", deserialized_ek);
-
-    // // Deserialize the DecryptionKey
-    // let deserialized_dk: DecryptionKey =
-    //     serde_json::from_str(&serialized_dk).expect("Failed to deserialize DecryptionKey");
-    // println!("Deserialized DecryptionKey: {:?}", deserialized_dk);
-
     (ek, dk)
 }
 
