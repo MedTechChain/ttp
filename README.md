@@ -5,11 +5,13 @@
 Set working directory to Rust project and build binary using cargo build with release flag.
 
 `cd paillier-encryption-backend`
+
 `cargo build --release`
 
 ### Install Rust
 
 You will probably need to install Rust if you don't have it
+
 `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 
 Run `rustc --version` to verify installation.
