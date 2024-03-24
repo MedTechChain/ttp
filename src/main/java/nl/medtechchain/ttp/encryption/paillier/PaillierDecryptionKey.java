@@ -1,15 +1,18 @@
-package nl.tudelft.medtechchain.ttp.encryption.paillier;
+package nl.medtechchain.ttp.encryption.paillier;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.tudelft.medtechchain.ttp.encryption.DecryptionKey;
+import nl.medtechchain.ttp.encryption.DecryptionKey;
 
 public class PaillierDecryptionKey implements DecryptionKey {
 
     String p;
     String q;
 
-    public PaillierDecryptionKey(String p, String q) {
+    @JsonCreator
+    public PaillierDecryptionKey(@JsonProperty("p") String p, @JsonProperty("q") String q) {
         this.p = p;
         this.q = q;
     }

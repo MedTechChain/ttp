@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TtpApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <module name="ttp.main" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="nl.tudelft.medtechchain.ttp.TtpApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="nl.medtechchain.ttp.TtpApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

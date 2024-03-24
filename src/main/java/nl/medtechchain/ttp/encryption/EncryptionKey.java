@@ -1,4 +1,4 @@
-package nl.tudelft.medtechchain.ttp.encryption;
+package nl.medtechchain.ttp.encryption;
 
 public interface EncryptionKey {
 

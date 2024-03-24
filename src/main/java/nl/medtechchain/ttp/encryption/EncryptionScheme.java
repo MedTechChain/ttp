@@ -1,12 +1,14 @@
-package nl.tudelft.medtechchain.ttp.encryption;
+package nl.medtechchain.ttp.encryption;
 
-public interface HomomorphicEncryptionScheme {
+import java.io.IOException;
+
+public interface EncryptionScheme {
     /**
      * Generates a new keypair and returns it as a single JSON string.
      *
      * @return A JSON string containing both the encryption and decryption keys.
      */
-    String generateKeypair();
+    KeyPair generateKeypair() throws IOException;
 
     /**
      * Encrypts a given plaintext with the provided encryption key.
@@ -15,7 +17,7 @@ public interface HomomorphicEncryptionScheme {
      * @param ek The encryption key in JSON format.
      * @return The encrypted ciphertext in a serialized form.
      */
-    String encrypt(long plaintext, String ek);
+    String encrypt(String plaintext, EncryptionKey ek) throws IOException;
 
     /**
      * Decrypts a given ciphertext with the provided decryption key.
@@ -24,5 +26,5 @@ public interface HomomorphicEncryptionScheme {
      * @param dk The decryption key in JSON format.
      * @return The decrypted plaintext.
      */
-    String decrypt(String ciphertext, String dk);
+    String decrypt(String ciphertext, DecryptionKey dk) throws IOException;
 }
