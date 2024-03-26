@@ -1,0 +1,21 @@
+services:
+  ttp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medtechchain/ttp
+    volumes:
+      - store:/app/lib/store
+    container_name: ttp.nl
+    profiles:
+      - light
+      - default
+    environment:
+      ENCRYPT_BINARY: "/app/lib/encrypt"
+      STORE_DIR_PATH: "/app/lib/store"
+    ports:
+      - "6000:6000"
+
+volumes:
+  store:
+    external: false

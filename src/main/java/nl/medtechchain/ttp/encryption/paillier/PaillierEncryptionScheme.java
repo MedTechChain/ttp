@@ -49,7 +49,8 @@ public class PaillierEncryptionScheme implements EncryptionScheme {
 
     @Override
     public String decrypt(String ciphertext, DecryptionKey dk) throws IOException {
-        String command = String.format("%s decrypt --ciphertext %s --dk '%s'", EncryptLibPath.get(), ciphertext, dk);
+        //String command = EncryptLibPath.get() + " decrypt --ciphertext '" + ciphertext + "' --dk '" + dk + "'";
+        String command = String.format("%s decrypt --ciphertext '%s' --dk '%s'", EncryptLibPath.get(), ciphertext, dk);
         return SubprocessCall.execute(command);
     }
 }
