@@ -26,7 +26,7 @@ Run `rustc --version` to verify installation. -->
 
 ### Docker
 
-`docker-compose --profile <default|light> -p medtechchain-ttp up -d --build`
+`docker-compose -p medtechchain-ttp up -d --build`
 
 ### IntelliJ
 
