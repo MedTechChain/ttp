@@ -1,6 +1,10 @@
 package nl.medtechchain.ttp.encryption;
 
+import java.time.Instant;
+
 public interface KeyPair {
-    EncryptionKey getEncryptionKey();
-    DecryptionKey getDecryptionKey();
+    Instant creationTime();
+    String id();
+    EncryptionKey encryptionKey();
+    DecryptionKey decryptionKey();
 }

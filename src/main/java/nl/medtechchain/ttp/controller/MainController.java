@@ -1,18 +1,15 @@
 package nl.medtechchain.ttp.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.medtechchain.ttp.encryption.EncryptionKey;
+import nl.medtechchain.ttp.controller.dto.*;
 import nl.medtechchain.ttp.encryption.EncryptionSchemeType;
 import nl.medtechchain.ttp.encryption.KeyPair;
-import nl.medtechchain.ttp.encryption.paillier.PaillierDecryptionKey;
-import nl.medtechchain.ttp.encryption.paillier.PaillierEncryptionKey;
 import nl.medtechchain.ttp.encryption.paillier.PaillierEncryptionScheme;
+import nl.medtechchain.ttp.encryption.paillier.PaillierKeyPair;
 import nl.medtechchain.ttp.store.KeyStore;
-import org.apache.coyote.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
@@ -21,69 +18,73 @@ public class MainController {
 
     private final KeyStore keyStore;
 
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-
     public MainController(KeyStore keyStore) {
         this.keyStore = keyStore;
     }
 
-    @GetMapping("/api/paillier/key")
-    public ResponseEntity<EncryptionKey> getEncryptionKey(@RequestParam(required = false, defaultValue = "2048") String bitLengthParam) throws IOException {
-        int bitLength = Integer.parseInt(bitLengthParam);
-
-        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, bitLength + "");
+    @PostMapping("/api/paillier/key")
+    public ResponseEntity<GetEncryptionKeyResponse> getEncryptionKey(@RequestBody GetEncryptionKeyRequest request) throws IOException {
+        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, request.bitLength() + "");
 
         var kpOpt = keyStore.get(keyFileName);
-        if(kpOpt.isPresent())
-            return ResponseEntity.ok(kpOpt.get().getEncryptionKey());
 
-        KeyPair kp = new PaillierEncryptionScheme(bitLength).generateKeypair();
+        KeyPair kp;
 
-        if(!keyStore.set(keyFileName, kp))
-            logger.warn("Key pair was not stored");
+        if (kpOpt.isPresent())
+            kp = kpOpt.get();
+        else {
+            kp = new PaillierEncryptionScheme(request.bitLength()).generateKeypair();
 
-        return ResponseEntity.ok(kp.getEncryptionKey());
+            if (!keyStore.set(keyFileName, kp))
+                throw new IllegalStateException("Error occurred on server: Could not store key");
+        }
+
+        return ResponseEntity.ok(new GetEncryptionKeyResponse(
+                EncryptionSchemeType.PAILLIER + "_" + request.bitLength(),
+                kp.id(),
+                kp.creationTime(),
+                kp.encryptionKey()
+        ));
     }
 
     // This method is just for testing purposes maybe
     @PostMapping("/api/paillier/encrypt")
-    public ResponseEntity<String> encrypt(@RequestParam(required = false, defaultValue = "2048") String bitLengthParam, @RequestBody String plaintext) throws IOException {
-        int bitLength = Integer.parseInt(bitLengthParam);
+    public ResponseEntity<EncryptResponse> encrypt(@RequestBody EncryptRequest request) throws IOException {
+        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, request.bitLength() + "");
 
-        // Parse the value inside plaintext json to pass to encryption binary
-        // {"plaintext": 42} -> 42
-        ObjectMapper mapper = new ObjectMapper();
-        plaintext = mapper.readTree(plaintext).get("plaintext").asText();
-
-        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, bitLength + "");
         var kpOpt = keyStore.get(keyFileName);
 
-        if(kpOpt.isPresent()) {
-            PaillierEncryptionKey ek = (PaillierEncryptionKey) kpOpt.get().getEncryptionKey();
-            PaillierEncryptionScheme pes = new PaillierEncryptionScheme(bitLength);
-            String ciphertext = pes.encrypt(plaintext, ek);
-            return ResponseEntity.ok(ciphertext);
+        if (kpOpt.isPresent()) {
+            PaillierKeyPair kp = (PaillierKeyPair) kpOpt.get();
+            PaillierEncryptionScheme pes = new PaillierEncryptionScheme(request.bitLength());
+            String ciphertext = pes.encrypt(request.plaintext(), kp.encryptionKey());
+            return ResponseEntity.ok(new EncryptResponse(
+                    EncryptionSchemeType.PAILLIER + "_" + request.bitLength(),
+                    kp.id(),
+                    ciphertext
+            ));
         } else {
-            // TODO: handle error
-            return null;
+            throw new IllegalStateException("Key not set!");
         }
     }
 
     @PostMapping("/api/paillier/decrypt")
-    public ResponseEntity<String> decrypt(@RequestParam(required = false, defaultValue = "2048") String bitLengthParam, @RequestBody String ciphertext) throws IOException {
-        int bitLength = Integer.parseInt(bitLengthParam);
+    public ResponseEntity<DecryptResponse> decrypt(@RequestBody DecryptRequest request) throws IOException {
+        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, request.bitLength() + "");
 
-        KeyStore.KeyFileName keyFileName = KeyStore.KeyFileName.make(EncryptionSchemeType.PAILLIER, bitLength + "");
         var kpOpt = keyStore.get(keyFileName);
 
-        if(kpOpt.isPresent()) {
-            PaillierDecryptionKey dk = (PaillierDecryptionKey) kpOpt.get().getDecryptionKey();
-            PaillierEncryptionScheme pes = new PaillierEncryptionScheme(bitLength);
-            String plaintext = pes.decrypt(ciphertext, dk);
-            return ResponseEntity.ok(plaintext);
+        if (kpOpt.isPresent()) {
+            PaillierKeyPair kp = (PaillierKeyPair) kpOpt.get();
+            PaillierEncryptionScheme pes = new PaillierEncryptionScheme(request.bitLength());
+            String ciphertext = pes.decrypt(request.ciphertext(), kp.decryptionKey());
+            return ResponseEntity.ok(new DecryptResponse(
+                    EncryptionSchemeType.PAILLIER + "_" + request.bitLength(),
+                    kp.id(),
+                    ciphertext
+            ));
         } else {
-            // TODO: handle error
-            return null;
+            throw new IllegalStateException("Key not set!");
         }
     }
 }

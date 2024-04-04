@@ -1,9 +1,10 @@
 package nl.medtechchain.ttp.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
-import nl.medtechchain.ttp.encryption.KeyPair;
 import nl.medtechchain.ttp.encryption.EncryptionSchemeType;
+import nl.medtechchain.ttp.encryption.KeyPair;
 import nl.medtechchain.ttp.encryption.paillier.PaillierKeyPair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,10 @@ public class KeyStore {
 
     @Value("${store.dir.path}")
     private String storePath;
+
+    public KeyStore() {
+        jackson.registerModule(new JavaTimeModule());
+    }
 
     @PostConstruct
     private void init() {
