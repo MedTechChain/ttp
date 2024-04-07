@@ -7,6 +7,14 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * Component to manage and validate the path to the encryption library binary.
+ * <p>
+ * This component is responsible for loading and verifying the path to an external encryption library binary,
+ * specified through application configuration. It ensures that the binary exists at the specified location
+ * at the time of application initialization and provides a global access point to this path for other components
+ * within the application.
+ */
 @Component
 public class EncryptLibPath {
 
