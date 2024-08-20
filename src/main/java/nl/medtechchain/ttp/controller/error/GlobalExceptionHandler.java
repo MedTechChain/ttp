@@ -20,6 +20,8 @@ public class GlobalExceptionHandler {
         errorResponse.setMessage(ex.getMessage());
         errorResponse.setPath(request.getRequestURI());
 
+        ex.printStackTrace();
+
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

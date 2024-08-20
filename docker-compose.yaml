@@ -1,10 +1,10 @@
 services:
-  ttp:
+  ttp.medtechchain.nl:
     build:
       context: .
       dockerfile: Dockerfile
     image: medtechchain/ttp
-    container_name: ttp.nl
+    container_name: ttp.medtechchain.nl
     environment:
       ENCRYPT_BINARY: "/app/lib/encrypt"
       STORE_DIR_PATH: "/app/lib/store"

@@ -42,4 +42,4 @@ out/
 ### MacOS ###
 .DS_Store
 
-/lib/
+/lib/store
